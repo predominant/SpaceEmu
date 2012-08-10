@@ -2,21 +2,36 @@
  * Player
  * ------------------------------
  */
-var Player = function(context) {
+var Player = function(context, x, y) {
 	this.context = context;
-	this.position = {
-		x: 100,
-		y: 100,
-		layer: 1
-	};
+	this.x = x;
+	this.y = y;
+	this.radius = 20;
 	this.fillStyle = 'rgb(255, 255, 255)';
 }
 Player.prototype.draw = function() {
 	this.context.fillStyle = this.fillStyle;
 	this.context.beginPath();
-	this.context.arc(this.position.x, this.position.y, 20, 0, Math.PI * 2, true);
+	this.context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
 	this.context.closePath();
 	this.context.fill();
+};
+
+/**
+ * Platform
+ * ------------------------------
+ */
+var Platform = function(context, x, y, width, height) {
+	this.context = context;
+	this.x = x;
+	this.y = y;
+	this.width = width;
+	this.height = height;
+	this.fillStyle = 'rgb(255, 255, 255)';
+}
+Platform.prototype.draw = function() {
+	this.context.fillStyle = this.fillStyle;
+	this.context.fillRect(this.x, this.y, this.width, this.height);
 };
 
 /**
@@ -27,9 +42,8 @@ var SpaceEmu = function() {
 	this.canvas = null;
 	this.context = null;
 
-	this.fallable = [];
-	this.collidable = [];
-	this.objects = [];
+	this.player = null;
+	this.platforms = [];
 };
 
 SpaceEmu.prototype.initialize = function() {
@@ -45,9 +59,13 @@ SpaceEmu.prototype.initialize = function() {
 };
 
 SpaceEmu.prototype.gameSetup = function() {
-	var player = new Player(this.context);
-	this.objects.push(player);
-	this.fallable.push(player);
+	this.player = new Player(this.context, 100, 50);
+
+	this.platforms.push(new Platform(this.context, 50, 130, 200, 20));
+	this.platforms.push(new Platform(this.context, 380, 130, 200, 20));
+	this.platforms.push(new Platform(this.context, 50, 280, 200, 20));
+	this.platforms.push(new Platform(this.context, 380, 280, 200, 20));
+	this.platforms.push(new Platform(this.context, 0, 420, 640, 20));
 };
 
 SpaceEmu.prototype.drawLoop = function() {
@@ -64,14 +82,28 @@ SpaceEmu.prototype.draw = function() {
 	this.context.fillStyle = 'rgb(21, 21, 21)';
 	this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-	for (var i in this.objects) {
-		this.objects[i].draw();
+	for (var i = 0; i < this.platforms.length; i++) {
+		this.platforms[i].draw();
 	}
+
+	this.player.draw();
 };
 
 SpaceEmu.prototype.update = function() {
-	for (var i in this.fallable) {
-		this.fallable[i].position.y += 4;
+	this.player.x += 1;
+	this.player.y += 4;
+
+	for (var i = 0; i < this.platforms.length; i++) {
+		var platform = this.platforms[i];
+
+		// If collision of bottom edge of the player with top edge of a platform
+		if (this.player.y + this.player.radius > platform.y &&
+			this.player.y + this.player.radius < platform.y + platform.height &&
+			this.player.x + this.player.radius > platform.x &&
+			this.player.x - this.player.radius < platform.x + platform.width) {
+
+			this.player.y = platform.y - this.player.radius;
+		}
 	}
 };
 
