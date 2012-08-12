@@ -8,16 +8,13 @@ var Player = function(context, x, y) {
 	this.context = context;
 	this.x = x;
 	this.y = y;
-	this.width = 15;
-	this.height = 15;
+	this.width = 25;
+	this.height = 25;
 	this.fillStyle = '#fff';
 }
 Player.prototype.draw = function() {
 	this.context.fillStyle = this.fillStyle;
-	this.context.beginPath();
-	this.context.arc(this.x, this.y, this.height, 0, Math.PI * 2, true);
-	this.context.closePath();
-	this.context.fill();
+	this.context.fillRect(this.x, this.y, this.width, this.height);
 };
 
 /**
@@ -129,7 +126,7 @@ SpaceEmu.prototype.update = function() {
 			if (this.fallable[i].y + this.fallable[i].height > collider.y &&
 				this.fallable[i].y + this.fallable[i].height < collider.y + collider.height &&
 				this.fallable[i].x + this.fallable[i].width > collider.x &&
-				this.fallable[i].x - this.fallable[i].width < collider.x + collider.width) {
+				this.fallable[i].x < collider.x + collider.width) {
 
 				this.fallable[i].y = collider.y - this.fallable[i].height;
 			}
