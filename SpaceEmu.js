@@ -7,7 +7,7 @@ var Player = function(context, x, y) {
 	this.x = x;
 	this.y = y;
 	this.radius = 20;
-	this.fillStyle = 'rgb(255, 255, 255)';
+	this.fillStyle = '#fff';
 }
 Player.prototype.draw = function() {
 	this.context.fillStyle = this.fillStyle;
@@ -27,7 +27,7 @@ var Platform = function(context, x, y, width, height) {
 	this.y = y;
 	this.width = width;
 	this.height = height;
-	this.fillStyle = 'rgb(255, 255, 255)';
+	this.fillStyle = '#fff';
 }
 Platform.prototype.draw = function() {
 	this.context.fillStyle = this.fillStyle;
@@ -79,7 +79,7 @@ SpaceEmu.prototype.updateLoop = function() {
 };
 
 SpaceEmu.prototype.draw = function() {
-	this.context.fillStyle = 'rgb(21, 21, 21)';
+	this.context.fillStyle = '#111';
 	this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
 	for (var i = 0; i < this.platforms.length; i++) {
