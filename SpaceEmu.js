@@ -68,7 +68,7 @@ SpaceEmu.prototype.gameSetup = function() {
 	this.player = new Player(this.context, 100, 50);
 	this.addObject(this.player);
 
-	var p2 = new Player(this.context, 320, 50);
+	var p2 = new Player(this.context, 390, 50);
 	this.addObject(p2);
 
 
@@ -142,6 +142,9 @@ SpaceEmu.prototype.update = function() {
 	for (var i in this.fallable) {
 		if (this.fallable[i].x > this.canvas.width) {
 			this.fallable[i].x = -this.fallable[i].width;
+		}
+		if (this.fallable[i].x < -this.fallable[i].width) {
+			this.fallable[i].x = this.canvas.width;
 		}
 	}
 };
