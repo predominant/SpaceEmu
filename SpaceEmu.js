@@ -8,8 +8,8 @@ var Player = function(context, sprites, x, y) {
 	this.context = context;
 	this.x = x;
 	this.y = y;
-	this.width = 25;
-	this.height = 25;
+	this.width = 30;
+	this.height = 30;
 	this.fillStyle = '#fff';
 	this.sprites = sprites;
 }
@@ -127,7 +127,7 @@ SpaceEmu.prototype.draw = function() {
 SpaceEmu.prototype.update = function() {
 	for (var i in this.fallable) {
 		this.fallable[i].x += 1;
-		this.fallable[i].y += 4;
+		this.fallable[i].y += 2;
 
 		for (var j in this.collidable) {
 			var collider = this.collidable[j];
