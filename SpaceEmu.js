@@ -72,11 +72,17 @@ SpaceEmu.prototype.gameSetup = function() {
 	this.addObject(p2);
 
 
-	this.createPlatform(50, 130, 200, 20);
-	this.createPlatform(380, 130, 200, 20);
-	this.createPlatform(50, 280, 200, 20);
-	this.createPlatform(380, 280, 200, 20);
-	this.createPlatform(0, 420, 640, 20);
+	this.createPlatform(-50, 130, 100, 7);
+	this.createPlatform(550, 130, 200, 7);
+	this.createPlatform(220, 150, 150, 7);
+
+	this.createPlatform(250, 300, 110, 7);
+
+	this.createPlatform(-50, 280, 160, 7);
+	this.createPlatform(550, 280, 150, 7);
+	this.createPlatform(450, 250, 110, 7);
+
+	this.createPlatform(-50, 420, 700, 7);
 };
 
 SpaceEmu.prototype.createPlatform = function(x, y, width, height) {
