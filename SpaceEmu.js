@@ -12,7 +12,7 @@ var Player = function(context, sprites, x, y) {
 	this.height = 30;
 	this.fillStyle = '#fff';
 	this.sprites = sprites;
-}
+};
 Player.prototype.draw = function() {
 	this.context.drawImage(this.sprites, 0, 16, 16, 16, this.x, this.y, this.width, this.height);
 };
@@ -30,7 +30,7 @@ var Platform = function(context, x, y, width, height) {
 	this.width = width;
 	this.height = height;
 	this.fillStyle = '#fff';
-}
+};
 Platform.prototype.draw = function() {
 	this.context.fillStyle = this.fillStyle;
 	this.context.fillRect(this.x, this.y, this.width, this.height);
