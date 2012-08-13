@@ -2,7 +2,7 @@
  * Player
  * ------------------------------
  */
-var Player = function(context, x, y) {
+var Player = function(context, sprites, x, y) {
 	this.gravity = true;
 	this.collidable = true;
 	this.context = context;
@@ -11,10 +11,10 @@ var Player = function(context, x, y) {
 	this.width = 25;
 	this.height = 25;
 	this.fillStyle = '#fff';
+	this.sprites = sprites;
 }
 Player.prototype.draw = function() {
-	this.context.fillStyle = this.fillStyle;
-	this.context.fillRect(this.x, this.y, this.width, this.height);
+	this.context.drawImage(this.sprites, 0, 16, 16, 16, this.x, this.y, this.width, this.height);
 };
 
 /**
@@ -50,6 +50,10 @@ var SpaceEmu = function() {
 	this.fallable = [];
 	this.collidable = [];
 	this.objects = [];
+
+	this.spriteFile = 'Sprites.png';
+	this.sprites = new Image();
+	this.sprites.src = this.spriteFile;
 };
 
 SpaceEmu.prototype.initialize = function() {
@@ -65,10 +69,10 @@ SpaceEmu.prototype.initialize = function() {
 };
 
 SpaceEmu.prototype.gameSetup = function() {
-	this.player = new Player(this.context, 100, 50);
+	this.player = new Player(this.context, this.sprites, 100, 50);
 	this.addObject(this.player);
 
-	var p2 = new Player(this.context, 390, 50);
+	var p2 = new Player(this.context, this.sprites, 390, 50);
 	this.addObject(p2);
 
 
