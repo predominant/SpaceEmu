@@ -138,6 +138,12 @@ SpaceEmu.prototype.update = function() {
 			}
 		}
 	}
+
+	for (var i in this.fallable) {
+		if (this.fallable[i].x > this.canvas.width) {
+			this.fallable[i].x = -this.fallable[i].width;
+		}
+	}
 };
 
 (function() {
