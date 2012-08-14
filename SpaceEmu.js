@@ -36,6 +36,7 @@ var Player = function(context, spriteImage, x, y) {
 Player.prototype.draw = function() {
 	var spriteIndex = this.spriteIndex;
 	if (game.frameCount % 15 == 0) {
+		spriteIndex = 0;
 		if (this.velocity.x > 0) {
 			spriteIndex = 4;
 		}
@@ -123,7 +124,7 @@ SpaceEmu.prototype.gameSetup = function() {
 	this.addObject(this.player);
 
 	var p2 = new Player(this.context, this.sprites, 390, 50);
-	p2.velocity.x = 2;
+	p2.velocity.x = -2;
 	this.addObject(p2);
 
 
