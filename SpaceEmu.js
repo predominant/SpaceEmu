@@ -2,7 +2,7 @@
  * Player
  * ------------------------------
  */
-var Player = function(context, sprites, x, y) {
+var Player = function(context, spriteImage, x, y) {
 	this.gravity = true;
 	this.collidable = true;
 	this.context = context;
@@ -11,14 +11,48 @@ var Player = function(context, sprites, x, y) {
 	this.width = 30;
 	this.height = 30;
 	this.fillStyle = '#fff';
-	this.sprites = sprites;
+	this.spriteImage = spriteImage;
 	this.velocity = {
 		x: 0,
 		y: 0
 	};
+
+	this.sprites = [
+		// Left-facing
+		{x: 0, y: 0, w: 16, h: 16},  // Walk 1 (Stand)
+		{x: 16, y: 0, w: 16, h: 16}, // Walk 2
+		{x: 24, y: 0, w: 16, h: 16}, // Fly 1
+		{x: 32, y: 0, w: 16, h: 16}, // Fly 2
+
+		// Right-facing
+		{x: 0, y: 16, w: 16, h: 16},  // Walk 1 (Stand)
+		{x: 16, y: 16, w: 16, h: 16}, // Walk 2
+		{x: 24, y: 16, w: 16, h: 16}, // Fly 1
+		{x: 32, y: 16, w: 16, h: 16}  // Fly 2
+	];
+	this.spriteFlag = true;
+	this.spriteIndex = 0;
 };
 Player.prototype.draw = function() {
-	this.context.drawImage(this.sprites, 0, 16, 16, 16, this.x, this.y, this.width, this.height);
+	var spriteIndex = this.spriteIndex;
+	if (game.frameCount % 15 == 0) {
+		if (this.velocity.x > 0) {
+			spriteIndex = 4;
+		}
+
+		if (Math.abs(this.velocity.x) >= 1) {
+			this.spriteFlag = !this.spriteFlag;
+			spriteIndex += this.spriteFlag ? 0 : 1;
+		}
+	}
+
+	this.context.drawImage(
+		this.spriteImage,
+		this.sprites[spriteIndex].x, this.sprites[spriteIndex].y,
+		this.sprites[spriteIndex].w, this.sprites[spriteIndex].h,
+		this.x, this.y,
+		this.width, this.height);
+	this.spriteIndex = spriteIndex;
 };
 Player.prototype.update = function() {
 
@@ -68,6 +102,7 @@ var SpaceEmu = function() {
 	this.gravity = 25;
 	this.deltaTime = 0;
 	this.lastUpdate = new Date().getMilliseconds();
+	this.frameCount = 0;
 };
 
 SpaceEmu.prototype.initialize = function() {
@@ -84,9 +119,11 @@ SpaceEmu.prototype.initialize = function() {
 
 SpaceEmu.prototype.gameSetup = function() {
 	this.player = new Player(this.context, this.sprites, 100, 50);
+	this.player.velocity.x = 2;
 	this.addObject(this.player);
 
 	var p2 = new Player(this.context, this.sprites, 390, 50);
+	p2.velocity.x = 2;
 	this.addObject(p2);
 
 
@@ -132,6 +169,7 @@ SpaceEmu.prototype.updateLoop = function() {
 };
 
 SpaceEmu.prototype.draw = function() {
+	this.frameCount++;
 	this.context.fillStyle = '#111';
 	this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -142,9 +180,12 @@ SpaceEmu.prototype.draw = function() {
 
 SpaceEmu.prototype.update = function() {
 	for (var i in this.fallable) {
+		// Falling
 		this.fallable[i].velocity.y += this.gravity * game.deltaTime;
-		this.fallable[i].x += 1;
 		this.fallable[i].y += this.fallable[i].velocity.y;
+
+		// Walking
+		this.fallable[i].x += this.fallable[i].velocity.x;
 
 		for (var j in this.collidable) {
 			var collider = this.collidable[j];
