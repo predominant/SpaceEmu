@@ -12,9 +12,19 @@ var Player = function(context, sprites, x, y) {
 	this.height = 30;
 	this.fillStyle = '#fff';
 	this.sprites = sprites;
+	this.velocity = {
+		x: 0,
+		y: 0
+	};
 };
 Player.prototype.draw = function() {
 	this.context.drawImage(this.sprites, 0, 16, 16, 16, this.x, this.y, this.width, this.height);
+};
+Player.prototype.update = function() {
+
+};
+Player.prototype.flap = function() {
+	this.velocity.y -= game.gravity * 2;
 };
 
 /**
@@ -45,7 +55,7 @@ var SpaceEmu = function() {
 	this.context = null;
 
 	this.player = null;
-	this.platforms = [];
+	//this.platforms = [];
 	
 	this.fallable = [];
 	this.collidable = [];
@@ -54,6 +64,10 @@ var SpaceEmu = function() {
 	this.spriteFile = 'Sprites.png';
 	this.sprites = new Image();
 	this.sprites.src = this.spriteFile;
+
+	this.gravity = 16;
+	this.deltaTime = 0;
+	this.lastUpdate = new Date().getMilliseconds();
 };
 
 SpaceEmu.prototype.initialize = function() {
@@ -91,7 +105,7 @@ SpaceEmu.prototype.gameSetup = function() {
 
 SpaceEmu.prototype.createPlatform = function(x, y, width, height) {
 	var p = new Platform(this.context, x, y, width, height);
-	this.platforms.push(p);
+	//this.platforms.push(p);
 	this.addObject(p);
 };
 
@@ -111,6 +125,8 @@ SpaceEmu.prototype.drawLoop = function() {
 };
 
 SpaceEmu.prototype.updateLoop = function() {
+	var d = new Date();
+	this.deltaTime = (d.getMilliseconds() - this.lastUpdate) / 1000;
 	game.update();
 	setTimeout(game.updateLoop, 1000 / 60);
 };
@@ -126,8 +142,9 @@ SpaceEmu.prototype.draw = function() {
 
 SpaceEmu.prototype.update = function() {
 	for (var i in this.fallable) {
+		this.fallable[i].velocity.y += this.gravity * game.deltaTime;
 		this.fallable[i].x += 1;
-		this.fallable[i].y += 2;
+		this.fallable[i].y += this.fallable[i].velocity.y;
 
 		for (var j in this.collidable) {
 			var collider = this.collidable[j];
@@ -139,6 +156,7 @@ SpaceEmu.prototype.update = function() {
 				this.fallable[i].x < collider.x + collider.width) {
 
 				this.fallable[i].y = collider.y - this.fallable[i].height;
+				this.fallable[i].velocity.y = 0;
 			}
 		}
 	}
