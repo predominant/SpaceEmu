@@ -65,7 +65,7 @@ var SpaceEmu = function() {
 	this.sprites = new Image();
 	this.sprites.src = this.spriteFile;
 
-	this.gravity = 16;
+	this.gravity = 25;
 	this.deltaTime = 0;
 	this.lastUpdate = new Date().getMilliseconds();
 };
