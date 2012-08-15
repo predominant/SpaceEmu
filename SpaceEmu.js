@@ -5,6 +5,8 @@
 var Player = function(context, spriteImage, x, y) {
 	this.gravity = true;
 	this.direction = 1;
+	this.flySpeed = 2;
+	this.maxFlySpeed = 20;
 	this.collidable = true;
 	this.context = context;
 	this.x = x;
@@ -258,6 +260,13 @@ window.onkeydown=function(e) {
 	else if (e.keyCode == 37) {		
 		game.player.velocity.x = -2;
 		game.player.direction = 0;
+	}
+	if (e.keyCode===32) {
+		game.player.y -= game.player.flySpeed;
+
+	if (game.player.flySpeed <= game.player.maxFlySpeed) {
+		game.player.flySpeed += 0.5;
+	}
 	}
  };
 
