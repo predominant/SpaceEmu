@@ -271,7 +271,7 @@ window.onkeydown=function(e) {
 		game.player.velocity.x = -2;
 		game.player.direction = false;
 	}
-	if (e.keyCode===32) {
+	if (e.keyCode===32 || e.keyCode===38 || e.keyCode===17) {
 		game.player.flap();
 	}
  };
