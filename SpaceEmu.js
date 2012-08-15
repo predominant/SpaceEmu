@@ -4,7 +4,7 @@
  */
 var Player = function(context, spriteImage, x, y) {
 	this.gravity = true;
-	this.direction = 1;
+	this.direction = true;
 	this.collidable = true;
 	this.flyVelocity = 1;
 	this.context = context;
@@ -38,7 +38,7 @@ var Player = function(context, spriteImage, x, y) {
 Player.prototype.draw = function() {
 	var spriteIndex = this.spriteIndex;
 	if (game.frameCount % 15 == 0) {
-		if (this.direction===0) {		
+		if (this.direction===false) {		
 			spriteIndex = 0;
 		}
 		else {
@@ -140,7 +140,7 @@ SpaceEmu.prototype.gameSetup = function() {
 
 	var p2 = new Player(this.context, this.sprites, 390, 50);
 	p2.velocity.x = -2;
-	p2.direction = 0;
+	p2.direction = false;
 	this.addObject(p2);
 
 
@@ -265,11 +265,11 @@ game.drawLoop();
 window.onkeydown=function(e) {	
 	if (e.keyCode==39) {		
 		game.player.velocity.x = 2;
-		game.player.direction = 1;
+		game.player.direction = true;
 	}
 	else if (e.keyCode == 37) {		
 		game.player.velocity.x = -2;
-		game.player.direction = 0;
+		game.player.direction = false;
 	}
 	if (e.keyCode===32) {
 		game.player.flap();
