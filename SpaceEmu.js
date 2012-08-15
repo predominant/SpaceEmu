@@ -5,9 +5,8 @@
 var Player = function(context, spriteImage, x, y) {
 	this.gravity = true;
 	this.direction = 1;
-	this.flySpeed = 2;
-	this.maxFlySpeed = 20;
 	this.collidable = true;
+	this.flyVelocity = 1;
 	this.context = context;
 	this.x = x;
 	this.y = y;
@@ -52,6 +51,10 @@ Player.prototype.draw = function() {
 		}
 	}
 
+	if (this.y > 0 && this.y < 10) {
+		this.velocity.y = 1;
+	}
+
 	this.context.drawImage(
 		this.spriteImage,
 		this.sprites[spriteIndex].x, this.sprites[spriteIndex].y,
@@ -64,7 +67,9 @@ Player.prototype.update = function() {
 
 };
 Player.prototype.flap = function() {
-	this.velocity.y -= game.gravity * 2;
+	if (this.velocity.y < this.flyVelocity) {
+		this.velocity.y -= game.gravity * 0.02;
+	}
 };
 
 /**
@@ -262,11 +267,7 @@ window.onkeydown=function(e) {
 		game.player.direction = 0;
 	}
 	if (e.keyCode===32) {
-		game.player.y -= game.player.flySpeed;
-
-	if (game.player.flySpeed <= game.player.maxFlySpeed) {
-		game.player.flySpeed += 0.5;
-	}
+		game.player.flap();
 	}
  };
 
