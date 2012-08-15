@@ -250,10 +250,8 @@ game.initialize();
 game.updateLoop();
 game.drawLoop();
 
-window.onkeydown=function(e) {
-	var event = window.event || e;
-	if (e.keyCode==39) {
-		//game.player.velocity.x=-game.player.velocity.x;
+window.onkeydown=function(e) {	
+	if (e.keyCode==39) {		
 		game.player.velocity.x = 2;
 		game.player.direction = 'RIGHT';
 	}
@@ -263,8 +261,7 @@ window.onkeydown=function(e) {
 	}
  };
 
-window.onkeyup=function(e) {
-	var event = window.event || e;
+window.onkeyup=function(e) {	
 	if (e.keyCode==39) {		
 		game.player.velocity.x = 0;
 	}
