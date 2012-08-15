@@ -250,25 +250,23 @@ game.initialize();
 game.updateLoop();
 game.drawLoop();
 
-window.onkeydown=function(e) {
+window.onkeydown = function(e) {
 	var event = window.event || e;
-	if (e.keyCode==39) {
+	if (e.keyCode == 39) {
 		//game.player.velocity.x=-game.player.velocity.x;
 		game.player.velocity.x = 2;
 		game.player.direction = 'RIGHT';
-	}
-	else if (e.keyCode == 37) {		
+	} else if (e.keyCode == 37) {		
 		game.player.velocity.x = -2;
 		game.player.direction = 'LEFT';
 	}
  };
 
-window.onkeyup=function(e) {
+window.onkeyup = function(e) {
 	var event = window.event || e;
-	if (e.keyCode==39) {		
+	if (e.keyCode == 39) {		
 		game.player.velocity.x = 0;
-	}
-	else if (e.keyCode == 37) {
+	} else if (e.keyCode == 37) {
 		game.player.velocity.x = 0;
 	}
 };
