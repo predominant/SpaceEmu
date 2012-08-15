@@ -49,6 +49,11 @@ Player.prototype.draw = function() {
 			this.spriteFlag = !this.spriteFlag;
 			spriteIndex += this.spriteFlag ? 0 : 1;
 		}
+
+		if (Math.abs(this.velocity.y) >= 1) {
+			this.spriteFlag = !this.spriteFlag;
+			spriteIndex += this.spriteFlag ? 2 : 3;
+		}
 	}
 
 	if (this.y > 0 && this.y < 10) {
