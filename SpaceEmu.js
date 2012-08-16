@@ -4,8 +4,9 @@
  */
 var Player = function(context, spriteImage, x, y) {
 	this.gravity = true;
-	this.direction = 'RIGHT';
+	this.direction = true;
 	this.collidable = true;
+	this.flyVelocity = 1;
 	this.context = context;
 	this.x = x;
 	this.y = y;
@@ -37,7 +38,7 @@ var Player = function(context, spriteImage, x, y) {
 Player.prototype.draw = function() {
 	var spriteIndex = this.spriteIndex;
 	if (game.frameCount % 15 == 0) {
-		if (this.direction==='LEFT') {		
+		if (this.direction===false) {		
 			spriteIndex = 0;
 		}
 		else {
@@ -48,6 +49,15 @@ Player.prototype.draw = function() {
 			this.spriteFlag = !this.spriteFlag;
 			spriteIndex += this.spriteFlag ? 0 : 1;
 		}
+
+		if (Math.abs(this.velocity.y) >= 1) {
+			this.spriteFlag = !this.spriteFlag;
+			spriteIndex += this.spriteFlag ? 2 : 3;
+		}
+	}
+
+	if (this.y > 0 && this.y < 10) {
+		this.velocity.y = 1;
 	}
 
 	this.context.drawImage(
@@ -62,7 +72,9 @@ Player.prototype.update = function() {
 
 };
 Player.prototype.flap = function() {
-	this.velocity.y -= game.gravity * 2;
+	if (this.velocity.y < this.flyVelocity) {
+		this.velocity.y -= game.gravity * 0.02;
+	}
 };
 
 /**
@@ -128,7 +140,7 @@ SpaceEmu.prototype.gameSetup = function() {
 
 	var p2 = new Player(this.context, this.sprites, 390, 50);
 	p2.velocity.x = -2;
-	p2.direction = 'LEFT';
+	p2.direction = false;
 	this.addObject(p2);
 
 
@@ -250,14 +262,17 @@ game.initialize();
 game.updateLoop();
 game.drawLoop();
 
-window.onkeydown = function(e) {
-	if (e.keyCode == 39) {
-		//game.player.velocity.x=-game.player.velocity.x;
+window.onkeydown=function(e) {	
+	if (e.keyCode == 39) {		
 		game.player.velocity.x = 2;
-		game.player.direction = 'RIGHT';
-	} else if (e.keyCode == 37) {		
+		game.player.direction = true;
+	}
+	else if (e.keyCode == 37) {		
 		game.player.velocity.x = -2;
-		game.player.direction = 'LEFT';
+		game.player.direction = false;
+	}
+	if (e.keyCode === 32 || e.keyCode === 38 || e.keyCode === 17) {
+		game.player.flap();
 	}
  };
 
