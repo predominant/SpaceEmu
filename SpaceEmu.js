@@ -18,7 +18,8 @@ var Player = function(context, spriteImage, x, y) {
 		x: 0,
 		y: 0
 	};
-
+	this.lives = 3;
+	this.score = 0;
 	this.sprites = [
 		// Left-facing
 		{x: 0, y: 0, w: 16, h: 16},  // Walk 1 (Stand)
@@ -97,189 +98,218 @@ Platform.prototype.draw = function() {
 };
 
 /**
+ * HUD
+ * ------------------------------
+ */
+var HUD = function (context, player) {
+    this.context = context;
+    this.player = player;   
+};
+
+HUD.prototype.draw = function () {
+
+    this.context.fillStyle = '#083766'; // dark bluish
+    this.context.fillRect(0, 429, 640, 50);
+    this.context.fillStyle = '#F2EA0C'; // yellow
+    this.context.font = "Bold 20px Arial";
+    this.context.fillText("Lives: ", 15, 460);
+
+    // draw number of lives
+    var imageIndexes = [0, 1, 0]; // indexes of sprites to show
+    var xOffset = 85;
+    for (var i = 0; i < this.player.lives; i++) {
+        this.context.drawImage(this.player.spriteImage,
+		    this.player.sprites[imageIndexes[i]].x, this.player.sprites[imageIndexes[i]].y,
+		    this.player.sprites[imageIndexes[i]].w, this.player.sprites[imageIndexes[i]].h,
+		    xOffset, 436,
+		    this.player.sprites[imageIndexes[i]].w*2, this.player.sprites[imageIndexes[i]].h*2);
+        xOffset += this.player.sprites[imageIndexes[i]].w*2 + 8; // add a little padding between sprites
+    }
+    this.context.fillText("Score: " + this.player.score, 500, 460);
+};
+/**
  * Game
  * ------------------------------
  */
 var SpaceEmu = function() {
-	this.canvas = null;
-	this.context = null;
+    this.canvas = null;
+    this.context = null;
 
-	this.player = null;
-	//this.platforms = [];
-	
-	this.fallable = [];
-	this.collidable = [];
-	this.objects = [];
+    this.player = null;
+    //this.platforms = [];
+    this.HUD = null;
+    this.fallable = [];
+    this.collidable = [];
+    this.objects = [];
 
-	this.spriteFile = 'Sprites.png';
-	this.sprites = new Image();
-	this.sprites.src = this.spriteFile;
+    this.spriteFile = 'Sprites.png';
+    this.sprites = new Image();
+    this.sprites.src = this.spriteFile;
 
-	this.gravity = 25;
-	this.deltaTime = 0;
-	this.lastUpdate = new Date().getMilliseconds();
-	this.frameCount = 0;
+    this.gravity = 25;
+    this.deltaTime = 0;
+    this.lastUpdate = new Date().getMilliseconds();
+    this.frameCount = 0;
 };
 
-SpaceEmu.prototype.initialize = function() {
-	this.canvas = document.createElement('canvas');
-	this.canvas.width = 640;
-	this.canvas.height = 480;
+    SpaceEmu.prototype.initialize = function() {
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = 640;
+        this.canvas.height = 480;
 
-	this.context = this.canvas.getContext('2d');
+        this.context = this.canvas.getContext('2d');
 
-	document.body.appendChild(this.canvas);
+        document.body.appendChild(this.canvas);
 
-	this.gameSetup();
-};
+        this.gameSetup();
+    };
 
-SpaceEmu.prototype.gameSetup = function() {
-	this.player = new Player(this.context, this.sprites, 100, 50);
-	this.player.velocity.x = 2;
-	this.addObject(this.player);
+    SpaceEmu.prototype.gameSetup = function() {
+        this.player = new Player(this.context, this.sprites, 100, 50);
+        this.player.velocity.x = 2;
+        this.addObject(this.player);
+        this.HUD = new HUD( this.context, this.player);
+        var p2 = new Player(this.context, this.sprites, 390, 50);
+        p2.velocity.x = -2;
+        p2.direction = false;
+        this.addObject(p2);
+        
+        this.createPlatform(-50, 130, 100, 7);
+        this.createPlatform(550, 130, 200, 7);
+        this.createPlatform(220, 150, 150, 7);
 
-	var p2 = new Player(this.context, this.sprites, 390, 50);
-	p2.velocity.x = -2;
-	p2.direction = false;
-	this.addObject(p2);
+        this.createPlatform(250, 300, 110, 7);
 
+        this.createPlatform(-50, 280, 160, 7);
+        this.createPlatform(550, 280, 150, 7);
+        this.createPlatform(450, 250, 110, 7);
 
-	this.createPlatform(-50, 130, 100, 7);
-	this.createPlatform(550, 130, 200, 7);
-	this.createPlatform(220, 150, 150, 7);
+        this.createPlatform(-50, 420, 700, 7);
+    };
 
-	this.createPlatform(250, 300, 110, 7);
+    SpaceEmu.prototype.createPlatform = function(x, y, width, height) {
+        var p = new Platform(this.context, x, y, width, height);
+        //this.platforms.push(p);
+        this.addObject(p);
+    };
 
-	this.createPlatform(-50, 280, 160, 7);
-	this.createPlatform(550, 280, 150, 7);
-	this.createPlatform(450, 250, 110, 7);
+    SpaceEmu.prototype.addObject = function(o) {
+        this.objects.push(o);
+        if (o.gravity) {
+            this.fallable.push(o);
+        }
+        if (o.collidable) {
+            this.collidable.push(o);
+        }
+    };
 
-	this.createPlatform(-50, 420, 700, 7);
-};
+    SpaceEmu.prototype.drawLoop = function() {
+        requestAnimationFrame(game.drawLoop);
+        game.draw();
+    };
 
-SpaceEmu.prototype.createPlatform = function(x, y, width, height) {
-	var p = new Platform(this.context, x, y, width, height);
-	//this.platforms.push(p);
-	this.addObject(p);
-};
+    SpaceEmu.prototype.updateLoop = function() {
+        var d = new Date();
+        this.deltaTime = (d.getMilliseconds() - this.lastUpdate) / 1000;
+        game.update();
+        setTimeout(game.updateLoop, 1000 / 60);
+    };
 
-SpaceEmu.prototype.addObject = function(o) {
-	this.objects.push(o);
-	if (o.gravity) {
-		this.fallable.push(o);
-	}
-	if (o.collidable) {
-		this.collidable.push(o);
-	}
-};
+    SpaceEmu.prototype.draw = function() {
+        this.frameCount++;
+        this.context.fillStyle = '#111';
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.HUD.draw();
+        for (var i in this.objects) {
+            this.objects[i].draw();
+        }
+    };
 
-SpaceEmu.prototype.drawLoop = function() {
-	requestAnimationFrame(game.drawLoop);
-	game.draw();
-};
+    SpaceEmu.prototype.update = function() {
+        for (var i in this.fallable) {
+            // Falling
+            this.fallable[i].velocity.y += this.gravity * game.deltaTime;
+            this.fallable[i].y += this.fallable[i].velocity.y;
 
-SpaceEmu.prototype.updateLoop = function() {
-	var d = new Date();
-	this.deltaTime = (d.getMilliseconds() - this.lastUpdate) / 1000;
-	game.update();
-	setTimeout(game.updateLoop, 1000 / 60);
-};
+            // Walking
+            this.fallable[i].x += this.fallable[i].velocity.x;
 
-SpaceEmu.prototype.draw = function() {
-	this.frameCount++;
-	this.context.fillStyle = '#111';
-	this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            for (var j in this.collidable) {
+                var collider = this.collidable[j];
 
-	for (var i in this.objects) {
-		this.objects[i].draw();
-	}
-};
+                // If collision of bottom edge of the player with top edge of a platform
+                if (this.fallable[i].y + this.fallable[i].height > collider.y &&
+                    this.fallable[i].y + this.fallable[i].height < collider.y + collider.height &&
+                    this.fallable[i].x + this.fallable[i].width > collider.x &&
+                    this.fallable[i].x < collider.x + collider.width) {
 
-SpaceEmu.prototype.update = function() {
-	for (var i in this.fallable) {
-		// Falling
-		this.fallable[i].velocity.y += this.gravity * game.deltaTime;
-		this.fallable[i].y += this.fallable[i].velocity.y;
+                    this.fallable[i].y = collider.y - this.fallable[i].height;
+                    this.fallable[i].velocity.y = 0;
+                }
+            }
+        }
 
-		// Walking
-		this.fallable[i].x += this.fallable[i].velocity.x;
+        for (var i in this.fallable) {
+            if (this.fallable[i].x > this.canvas.width) {
+                this.fallable[i].x = -this.fallable[i].width;
+            }
+            if (this.fallable[i].x < -this.fallable[i].width) {
+                this.fallable[i].x = this.canvas.width;
+            }
+        }
+    };
 
-		for (var j in this.collidable) {
-			var collider = this.collidable[j];
-
-			// If collision of bottom edge of the player with top edge of a platform
-			if (this.fallable[i].y + this.fallable[i].height > collider.y &&
-				this.fallable[i].y + this.fallable[i].height < collider.y + collider.height &&
-				this.fallable[i].x + this.fallable[i].width > collider.x &&
-				this.fallable[i].x < collider.x + collider.width) {
-
-				this.fallable[i].y = collider.y - this.fallable[i].height;
-				this.fallable[i].velocity.y = 0;
-			}
-		}
-	}
-
-	for (var i in this.fallable) {
-		if (this.fallable[i].x > this.canvas.width) {
-			this.fallable[i].x = -this.fallable[i].width;
-		}
-		if (this.fallable[i].x < -this.fallable[i].width) {
-			this.fallable[i].x = this.canvas.width;
-		}
-	}
-};
-
-(function() {
-	var lastTime = 0;
-	var vendors = ['ms', 'moz', 'webkit', 'o'];
-	for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-		window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
-		window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
-	}
+    (function() {
+        var lastTime = 0;
+        var vendors = ['ms', 'moz', 'webkit', 'o'];
+        for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+            window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+            window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+        }
  
-	if (!window.requestAnimationFrame) {
-		window.requestAnimationFrame = function(callback, element) {
-			var currTime = new Date().getTime();
-			var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-			var id = window.setTimeout(function() {
-				callback(currTime + timeToCall);
-			}, timeToCall);
-			lastTime = currTime + timeToCall;
-			return id;
-		};
-	}
+        if (!window.requestAnimationFrame) {
+            window.requestAnimationFrame = function(callback, element) {
+                var currTime = new Date().getTime();
+                var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                var id = window.setTimeout(function() {
+                    callback(currTime + timeToCall);
+                }, timeToCall);
+                lastTime = currTime + timeToCall;
+                return id;
+            };
+        }
  
-	if (!window.cancelAnimationFrame) {
-		window.cancelAnimationFrame = function(id) {
-			clearTimeout(id);
-		};
-	}
+        if (!window.cancelAnimationFrame) {
+            window.cancelAnimationFrame = function(id) {
+                clearTimeout(id);
+            };
+        }
 
-}());
+    }());
 
-var game = new SpaceEmu();
-game.initialize();
-game.updateLoop();
-game.drawLoop();
+    var game = new SpaceEmu();
+    game.initialize();
+    game.updateLoop();
+    game.drawLoop();
 
-window.onkeydown=function(e) {	
-	if (e.keyCode == 39) {		
-		game.player.velocity.x = 2;
-		game.player.direction = true;
-	}
-	else if (e.keyCode == 37) {		
-		game.player.velocity.x = -2;
-		game.player.direction = false;
-	}
-	if (e.keyCode === 32 || e.keyCode === 38 || e.keyCode === 17) {
-		game.player.flap();
-	}
- };
+    window.onkeydown=function(e) {	
+        if (e.keyCode == 39) {		
+            game.player.velocity.x = 2;
+            game.player.direction = true;
+        }
+        else if (e.keyCode == 37) {		
+            game.player.velocity.x = -2;
+            game.player.direction = false;
+        }
+        if (e.keyCode === 32 || e.keyCode === 38 || e.keyCode === 17) {
+            game.player.flap();
+        }
+    };
 
-window.onkeyup = function(e) {
-	if (e.keyCode == 39) {		
-		game.player.velocity.x = 0;
-	} else if (e.keyCode == 37) {
-		game.player.velocity.x = 0;
-	}
-};
+    window.onkeyup = function(e) {
+        if (e.keyCode == 39) {		
+            game.player.velocity.x = 0;
+        } else if (e.keyCode == 37) {
+            game.player.velocity.x = 0;
+        }
+    };
